@@ -43,6 +43,7 @@
     },
     "vmSize": {
       "type": "string",
+      "defaultValue": "Standard_B2s",
       "metadata": {
         "description": "VM Size. For available virtual machine sizes, see https://docs.microsoft.com/en-us/azure/templates/microsoft.compute/2019-07-01/virtualmachines#HardwareProfile"
       }
