@@ -441,6 +441,7 @@
               "type": "Microsoft.DBForPostgreSQL/servers",
               "apiVersion": "2017-12-01",
               "name": "[parameters('psqlResourceName')]",
+              "subscriptionId": "3248fb53-e4cd-4c71-896d-c6c7c20edb21",
               "location": "[parameters('location')]",
               "properties": {
                 "administratorLogin": "[parameters('psqlLogin')]",
@@ -451,8 +452,8 @@
                 "version": "11"
               },
               "sku": {
-                "name": "B_Gen5_1",
-                "tier": "Basic",
+                "name": "GP_Gen5_2",
+                "tier": "GeneralPurpose",
                 "family": "Gen5",
                 "size": 5120,
                 "capacity": "[parameters('psqlSkuCapacity')]"
