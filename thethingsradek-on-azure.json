@@ -77,12 +77,11 @@
     },
     "psqlSkuCapacity": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 2,
       "metadata": {
         "description": "Azure database for PostgreSQL compute capacity (# of vCores)"
       },
       "allowedValues": [
-        1,
         2,
         4,
         8,
@@ -367,6 +366,8 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "postgreSQLDeployment",
+      "subscriptionId": "3248fb53-e4cd-4c71-896d-c6c7c20edb21",
+      "resourceGroup": "TheThingsRadekPSQL",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -441,8 +442,6 @@
               "type": "Microsoft.DBForPostgreSQL/servers",
               "apiVersion": "2017-12-01",
               "name": "[parameters('psqlResourceName')]",
-              "subscriptionId": "3248fb53-e4cd-4c71-896d-c6c7c20edb21",
-              "resourceGroup": "TheThingsRadekPSQL",
               "location": "[parameters('location')]",
               "properties": {
                 "administratorLogin": "[parameters('psqlLogin')]",
