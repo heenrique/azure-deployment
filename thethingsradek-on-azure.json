@@ -340,7 +340,7 @@
     },
     {
       "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2020-04-01-preview",
+      "apiVersion": "2020-10-01-preview",
       "name": "[guid(variables('vmName'), variables('keyVaultReaderRole'))]",
       "properties": {
         "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', variables('vmName')), '2020-06-01', 'full').identity.principalId]",
@@ -352,7 +352,7 @@
     },
     {
       "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2020-04-01-preview",
+      "apiVersion": "2020-10-01-preview",
       "name": "[guid(variables('vmName'), variables('vmContributorRole'))]",
       "properties": {
         "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', variables('vmName')), '2020-06-01', 'full').identity.principalId]",
@@ -397,7 +397,7 @@
           }
         },
         "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
           "metadata": {
             "_generator": {
@@ -455,7 +455,7 @@
                 "name": "GP_Gen5_2",
                 "tier": "GeneralPurpose",
                 "family": "Gen5",
-                "size": 5120,
+                "size": "5120",
                 "capacity": "[parameters('psqlSkuCapacity')]"
               }
             },
@@ -475,6 +475,7 @@
               "type": "Microsoft.DBForPostgreSQL/servers/databases",
               "apiVersion": "2017-12-01-preview",
               "name": "[format('{0}/{1}', parameters('psqlResourceName'), parameters('psqlDatabaseName'))]",
+              "properties": {},
               "dependsOn": [
                 "[resourceId('Microsoft.DBForPostgreSQL/servers', parameters('psqlResourceName'))]"
               ]

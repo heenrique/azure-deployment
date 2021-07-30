@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "" // TODO: Fill in parameter value
+        },
+        "prefix": {
+            "value": "ttrdk"
+        },
+        "adminEmail": {
+            "value": "riot@radek.com.br"
+        },
+        "adminPassword": {
+            "value": "" // TODO: Fill in parameter value
+        },
+        "networkName": {
+            "value": "The Things Radek"
+        },
+        "vmSize": {
+            "value": "Standard_B2s"
+        },
+        "vmUserName": {
+            "value": "ttrdk-daemon"
+        },
+        "vmAuthenticationType": {
+            "value": "password"
+        },
+        "vmAdminPasswordOrKey": {
+            "value": "" // TODO: Fill in parameter value
+        },
+        "psqlPassword": {
+            "value": "" // TODO: Fill in parameter value
+        },
+        "psqlSkuCapacity": {
+            "value": 2
+        },
+        "dnsLabelPrefix": {
+            "value": "" // TODO: Fill in parameter value
+        }
+    }
+}
