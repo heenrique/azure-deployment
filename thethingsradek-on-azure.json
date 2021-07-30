@@ -363,204 +363,198 @@
       ]
     },
     {
-      "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
-      "contentVersion": "1.0.0.0",
-      "resources": [
-        {
-        "type": "Microsoft.Resources/deployments",
-        "apiVersion": "2019-10-01",
-        "name": "postgreSQLDeployment",
-        "subscriptionId": "3248fb53-e4cd-4c71-896d-c6c7c20edb21",
-        "resourceGroup": "TheThingsRadekPSQL",
-        "properties": {
-          "expressionEvaluationOptions": {
-            "scope": "inner"
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "postgreSQLDeployment",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "psqlResourceName": {
+            "value": "[variables('psqlResourceName')]"
           },
-          "mode": "Incremental",
-          "parameters": {
-            "psqlResourceName": {
-              "value": "[variables('psqlResourceName')]"
-            },
-            "subnetId": {
-              "value": "[variables('subnetRef')]"
-            },
-            "vnetID": {
-              "value": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
-            },
-            "psqlSkuCapacity": {
-              "value": "[parameters('psqlSkuCapacity')]"
-            },
-            "psqlLogin": {
-              "value": "[variables('psqlLogin')]"
-            },
-            "psqlPassword": {
-              "value": "[parameters('psqlPassword')]"
-            },
-            "psqlDatabaseName": {
-              "value": "[variables('psqlDatabaseName')]"
-            }
+          "subnetId": {
+            "value": "[variables('subnetRef')]"
           },
-          "template": {
-            "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-            "contentVersion": "1.0.0.0",
-            "metadata": {
-              "_generator": {
-                "name": "bicep",
-                "version": "0.4.63.48766",
-                "templateHash": "5055848089161258452"
-              }
-            },
-            "parameters": {
-              "location": {
-                "type": "string",
-                "defaultValue": "[resourceGroup().location]"
-              },
-              "subnetId": {
-                "type": "string"
-              },
-              "vnetID": {
-                "type": "string"
-              },
-              "psqlResourceName": {
-                "type": "string"
-              },
-              "psqlSkuCapacity": {
-                "type": "int"
-              },
-              "psqlLogin": {
-                "type": "string"
-              },
-              "psqlPassword": {
-                "type": "secureString"
-              },
-              "psqlDatabaseName": {
-                "type": "string"
-              }
-            },
-            "functions": [],
-            "variables": {
-              "privateDnsZoneName": "privatelink.postgres.database.azure.com"
-            },
-            "resources": [
-              {
-                "type": "Microsoft.DBForPostgreSQL/servers",
-                "apiVersion": "2017-12-01",
-                "name": "[parameters('psqlResourceName')]",
-                "location": "[parameters('location')]",
-                "properties": {
-                  "administratorLogin": "[parameters('psqlLogin')]",
-                  "administratorLoginPassword": "[parameters('psqlPassword')]",
-                  "createMode": "Default",
-                  "sslEnforcement": "Enabled",
-                  "publicNetworkAccess": "Enabled",
-                  "version": "11"
-                },
-                "sku": {
-                  "name": "GP_Gen5_2",
-                  "tier": "GeneralPurpose",
-                  "family": "Gen5",
-                  "size": "5120",
-                  "capacity": "[parameters('psqlSkuCapacity')]"
-                }
-              },
-              {
-                "type": "Microsoft.DBForPostgreSQL/servers/virtualNetworkRules",
-                "apiVersion": "2017-12-01",
-                "name": "[format('{0}/vnet', parameters('psqlResourceName'))]",
-                "properties": {
-                  "virtualNetworkSubnetId": "[parameters('subnetId')]",
-                  "ignoreMissingVnetServiceEndpoint": true
-                },
-                "dependsOn": [
-                  "[resourceId('Microsoft.DBForPostgreSQL/servers', parameters('psqlResourceName'))]"
-                ]
-              },
-              {
-                "type": "Microsoft.DBForPostgreSQL/servers/databases",
-                "apiVersion": "2017-12-01-preview",
-                "name": "[format('{0}/{1}', parameters('psqlResourceName'), parameters('psqlDatabaseName'))]",
-                "properties": {},
-                "dependsOn": [
-                  "[resourceId('Microsoft.DBForPostgreSQL/servers', parameters('psqlResourceName'))]"
-                ]
-              },
-              {
-                "type": "Microsoft.Network/privateEndpoints",
-                "apiVersion": "2020-06-01",
-                "name": "[format('{0}-privateendpoint', parameters('psqlResourceName'))]",
-                "location": "[parameters('location')]",
-                "properties": {
-                  "privateLinkServiceConnections": [
-                    {
-                      "name": "[format('{0}-privateendpoint', parameters('psqlResourceName'))]",
-                      "properties": {
-                        "privateLinkServiceId": "[resourceId('Microsoft.DBForPostgreSQL/servers', parameters('psqlResourceName'))]",
-                        "groupIds": [
-                          "postgresqlServer"
-                        ]
-                      }
-                    }
-                  ],
-                  "subnet": {
-                    "id": "[parameters('subnetId')]"
-                  }
-                },
-                "dependsOn": [
-                  "[resourceId('Microsoft.DBForPostgreSQL/servers', parameters('psqlResourceName'))]"
-                ]
-              },
-              {
-                "type": "Microsoft.Network/privateDnsZones",
-                "apiVersion": "2018-09-01",
-                "name": "[variables('privateDnsZoneName')]",
-                "location": "global"
-              },
-              {
-                "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-                "apiVersion": "2018-09-01",
-                "name": "[format('{0}/{1}', variables('privateDnsZoneName'), uniqueString(parameters('vnetID')))]",
-                "location": "global",
-                "properties": {
-                  "registrationEnabled": false,
-                  "virtualNetwork": {
-                    "id": "[parameters('vnetID')]"
-                  }
-                },
-                "dependsOn": [
-                  "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
-                ]
-              },
-              {
-                "type": "Microsoft.Network/privateDnsZones/A",
-                "apiVersion": "2018-09-01",
-                "name": "[format('{0}/{1}', variables('privateDnsZoneName'), parameters('psqlResourceName'))]",
-                "properties": {
-                  "aRecords": [
-                    {
-                      "ipv4Address": "[reference(resourceId('Microsoft.Network/privateEndpoints', format('{0}-privateendpoint', parameters('psqlResourceName')))).customDnsConfigs[0].ipAddresses[0]]"
-                    }
-                  ],
-                  "ttl": 3600
-                },
-                "dependsOn": [
-                  "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-privateendpoint', parameters('psqlResourceName')))]",
-                  "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
-                ]
-              }
-            ],
-            "outputs": {
-              "fqdn": {
-                "type": "string",
-                "value": "[reference(resourceId('Microsoft.DBForPostgreSQL/servers', parameters('psqlResourceName'))).fullyQualifiedDomainName]"
-              }
-            }
+          "vnetID": {
+            "value": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+          },
+          "psqlSkuCapacity": {
+            "value": "[parameters('psqlSkuCapacity')]"
+          },
+          "psqlLogin": {
+            "value": "[variables('psqlLogin')]"
+          },
+          "psqlPassword": {
+            "value": "[parameters('psqlPassword')]"
+          },
+          "psqlDatabaseName": {
+            "value": "[variables('psqlDatabaseName')]"
           }
         },
-        "dependsOn": [
-          "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
-        ]
-      }],
-      "outputs": {}
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "5055848089161258452"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "subnetId": {
+              "type": "string"
+            },
+            "vnetID": {
+              "type": "string"
+            },
+            "psqlResourceName": {
+              "type": "string"
+            },
+            "psqlSkuCapacity": {
+              "type": "int"
+            },
+            "psqlLogin": {
+              "type": "string"
+            },
+            "psqlPassword": {
+              "type": "secureString"
+            },
+            "psqlDatabaseName": {
+              "type": "string"
+            }
+          },
+          "functions": [],
+          "variables": {
+            "privateDnsZoneName": "privatelink.postgres.database.azure.com"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DBForPostgreSQL/servers",
+              "apiVersion": "2017-12-01",
+              "name": "[parameters('psqlResourceName')]",
+              "location": "[parameters('location')]",
+              "subscriptionId": "3248fb53-e4cd-4c71-896d-c6c7c20edb21",
+              "resourceGroup": "TheThingsRadekPSQL",
+              "properties": {
+                "administratorLogin": "[parameters('psqlLogin')]",
+                "administratorLoginPassword": "[parameters('psqlPassword')]",
+                "createMode": "Default",
+                "sslEnforcement": "Enabled",
+                "publicNetworkAccess": "Enabled",
+                "version": "11"
+              },
+              "sku": {
+                "name": "GP_Gen5_2",
+                "tier": "GeneralPurpose",
+                "family": "Gen5",
+                "size": "5120",
+                "capacity": "[parameters('psqlSkuCapacity')]"
+              }
+            },
+            {
+              "type": "Microsoft.DBForPostgreSQL/servers/virtualNetworkRules",
+              "apiVersion": "2017-12-01",
+              "name": "[format('{0}/vnet', parameters('psqlResourceName'))]",
+              "properties": {
+                "virtualNetworkSubnetId": "[parameters('subnetId')]",
+                "ignoreMissingVnetServiceEndpoint": true
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DBForPostgreSQL/servers', parameters('psqlResourceName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DBForPostgreSQL/servers/databases",
+              "apiVersion": "2017-12-01-preview",
+              "name": "[format('{0}/{1}', parameters('psqlResourceName'), parameters('psqlDatabaseName'))]",
+              "properties": {},
+              "dependsOn": [
+                "[resourceId('Microsoft.DBForPostgreSQL/servers', parameters('psqlResourceName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints",
+              "apiVersion": "2020-06-01",
+              "name": "[format('{0}-privateendpoint', parameters('psqlResourceName'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "privateLinkServiceConnections": [
+                  {
+                    "name": "[format('{0}-privateendpoint', parameters('psqlResourceName'))]",
+                    "properties": {
+                      "privateLinkServiceId": "[resourceId('Microsoft.DBForPostgreSQL/servers', parameters('psqlResourceName'))]",
+                      "groupIds": [
+                        "postgresqlServer"
+                      ]
+                    }
+                  }
+                ],
+                "subnet": {
+                  "id": "[parameters('subnetId')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DBForPostgreSQL/servers', parameters('psqlResourceName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones",
+              "apiVersion": "2018-09-01",
+              "name": "[variables('privateDnsZoneName')]",
+              "location": "global"
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "apiVersion": "2018-09-01",
+              "name": "[format('{0}/{1}', variables('privateDnsZoneName'), uniqueString(parameters('vnetID')))]",
+              "location": "global",
+              "properties": {
+                "registrationEnabled": false,
+                "virtualNetwork": {
+                  "id": "[parameters('vnetID')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones/A",
+              "apiVersion": "2018-09-01",
+              "name": "[format('{0}/{1}', variables('privateDnsZoneName'), parameters('psqlResourceName'))]",
+              "properties": {
+                "aRecords": [
+                  {
+                    "ipv4Address": "[reference(resourceId('Microsoft.Network/privateEndpoints', format('{0}-privateendpoint', parameters('psqlResourceName')))).customDnsConfigs[0].ipAddresses[0]]"
+                  }
+                ],
+                "ttl": 3600
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-privateendpoint', parameters('psqlResourceName')))]",
+                "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "fqdn": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.DBForPostgreSQL/servers', parameters('psqlResourceName'))).fullyQualifiedDomainName]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+      ]
     },
     {
       "type": "Microsoft.Resources/deployments",
