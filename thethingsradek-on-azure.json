@@ -442,6 +442,7 @@
               "apiVersion": "2017-12-01",
               "name": "[parameters('psqlResourceName')]",
               "subscriptionId": "3248fb53-e4cd-4c71-896d-c6c7c20edb21",
+              "resourceGroup": "TheThingsRadekPSQL",
               "location": "[parameters('location')]",
               "properties": {
                 "administratorLogin": "[parameters('psqlLogin')]",
